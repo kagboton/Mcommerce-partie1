@@ -8,15 +8,17 @@ import com.fasterxml.jackson.databind.ser.impl.SimpleBeanPropertyFilter;
 import com.fasterxml.jackson.databind.ser.impl.SimpleFilterProvider;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.json.MappingJacksonValue;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
-
 import javax.validation.Valid;
 import java.net.URI;
 import java.util.List;
+
 
 
 @Api( description="API pour es opérations CRUD sur les produits.")
@@ -62,8 +64,6 @@ public class ProductController {
     }
 
 
-
-
     //ajouter un produit
     @PostMapping(value = "/Produits")
 
@@ -101,6 +101,21 @@ public class ProductController {
     public List<Product>  testeDeRequetes(@PathVariable int prix) {
 
         return productDao.chercherUnProduitCher(400);
+    }
+
+    //Affichage de la marge
+    @GetMapping(value = "/AdminProduits")
+    public String calculerMargeProduit() throws JSONException {
+
+        JSONObject jsonString = new JSONObject();
+        List<Product> products = productDao.findAll();
+        int marge;
+
+        for (Product product : products) {
+            marge = product.getPrix() - product.getPrixAchat();
+            jsonString.put(product.toString(), marge );
+        }
+        return jsonString.toString();
     }
 
 
