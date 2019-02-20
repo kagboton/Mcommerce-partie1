@@ -118,6 +118,11 @@ public class ProductController {
         return jsonString.toString();
     }
 
+    //Tri par ordre alphabétique
+    @GetMapping(value = "/ProduitsTries")
+    public List<Product> trierProduitsParOrdreAlphabetique(){
+        return productDao.findAllByOrderByNomAsc();
+    }
 
 
 }
