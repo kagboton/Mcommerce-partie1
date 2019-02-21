@@ -2,6 +2,7 @@ package com.ecommerce.microcommerce.web.controller;
 
 import com.ecommerce.microcommerce.dao.ProductDao;
 import com.ecommerce.microcommerce.model.Product;
+import com.ecommerce.microcommerce.web.exceptions.ProduitGratuitException;
 import com.ecommerce.microcommerce.web.exceptions.ProduitIntrouvableException;
 import com.fasterxml.jackson.databind.ser.FilterProvider;
 import com.fasterxml.jackson.databind.ser.impl.SimpleBeanPropertyFilter;
@@ -11,6 +12,7 @@ import io.swagger.annotations.ApiOperation;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.RequestEntity;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.json.MappingJacksonValue;
 import org.springframework.web.bind.annotation.*;
@@ -64,12 +66,19 @@ public class ProductController {
     }
 
 
-    //ajouter un produit
+    //ajouter un produit et validation du prix de vente
     @PostMapping(value = "/Produits")
 
-    public ResponseEntity<Void> ajouterProduit(@Valid @RequestBody Product product) {
+    public ResponseEntity<Void> ajouterProduit(@Valid @RequestBody Product product) throws ProduitGratuitException {
 
-        Product productAdded =  productDao.save(product);
+        Product productAdded;
+
+        if(product.getPrix() == 0 ){
+            throw new ProduitGratuitException("Le prix de vente est 0, vous ne pouvez pas ajouter ce produit");
+        }else {
+            productAdded =  productDao.save(product);
+        }
+
 
         if (productAdded == null)
             return ResponseEntity.noContent().build();
